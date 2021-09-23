@@ -32,6 +32,8 @@ class pancake_stack:
     parent = None
     fliploc = 0
     fwd_cost = 0
+    heuristic = 0
+    total_cost = fwd_cost + heuristic
     def __init__(self,stackstr):
         for i in range(0,len(stackstr),2):
             pancake = Pancake(int(stackstr[i]),stackstr[i+1])
@@ -53,7 +55,23 @@ class pancake_stack:
         for i in range(len(self.stack)):
             if self.stack[i].size-1 != i:
                 heuristic = max(heuristic,self.stack[i].size)
-        return heuristic
+
+    def __str__(self):
+        s = ""
+        for i in range(0,len(self.stack)):
+            s += str(self.stack[i].size) + self.stack[i].orientation
+        return s
+
+    def __eq__(self,other):
+        if len(self.stack) != len(other.stack):
+            return False
+        for i in range(0,len(self.stack)):
+            if self.stack[i] != other.stack[i]:
+                return False
+        return True
+
+    def settotalcost(self):
+        self.total_cost = self.fwd_cost + self.heuristic
 
     def goalCheck(self):
         for i in range(0,len(self.stack)):
@@ -85,6 +103,7 @@ def expandNode(node):
     for i in range(1,len(node.stack)+1):
         node.parent = copy.deepcopy(node)
         node.fliploc = i
+        node.fwd_cost += i
         newnode = copy.deepcopy(node)
         newnode.flip(i)
         subfringe.append(newnode)
@@ -101,9 +120,21 @@ def printresult(result):
     
 def pancake_sort_a(fringe):
     '''a* sorting algorithm for pancake flipping'''
-    
-
-
+    closed_set = []
+    minnode = fringe[0]
+    while minnode.goalCheck() == False:
+        for node in fringe:
+            node.pancake_heuristic()
+        minnode = min(fringe,key=lambda x: x.total_cost)
+        subfringe = expandNode(copy.deepcopy(minnode))
+        closed_set.append(minnode)
+        fringe.remove(minnode)
+        for node in subfringe:
+            if node not in closed_set:
+                fringe.append(node)
+            printresult(node)
+        print("")
+    return minnode
 
 def pancake_sort_b(fringe):
     '''breadth-first sorting algorithm for pancake flipping'''
@@ -126,7 +157,7 @@ def pancake_sort_b(fringe):
 if __name__ == "__main__":
     #stackstr,algo = pancakeparams()
     stackstr = "2b1b3w4w"
-    algo = "b"
+    algo = "a"
     node = pancake_stack(stackstr)
     fringe = [node]
     result = pancake_sort(fringe,algo)
