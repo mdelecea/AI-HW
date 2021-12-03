@@ -77,7 +77,7 @@ def q_Learning():
     episodes = 0
     while episodes < max_episodes:
         currState = board[1]
-        while not (currState.type == 'G' or currState.type == 'F'):
+        while currState.type not in ['G','F']:
             if np.random.uniform() < epsilon: #Take random action
                 action_I = np.random.choice(currState.actions)
             else: #Take action with highest Q-value
@@ -87,8 +87,9 @@ def q_Learning():
             else:
                 newState = board[action_I]
             if newState.type == "W":
-                    newState = currState
-            currState.Q_vals[currState.actions.index(action_I)] = round((1-learning_rate)*currState.Q_vals[currState.actions.index(action_I)]+learning_rate*(newState.reward + discount_rate*max(newState.Q_vals)),4)
+                newState = currState
+            currState.Q_vals[currState.actions.index(action_I)] = round((1-learning_rate)*currState.Q_vals[currState.actions.index(action_I)]+\
+                learning_rate*(newState.reward + discount_rate*max(newState.Q_vals)),4)
             if newState.type != "W":
                 currState = newState
         episodes += 1
