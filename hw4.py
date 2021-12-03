@@ -36,10 +36,10 @@ if __name__ == "__main__":
             if v[j] != 1:
                 v[j] = 0
         while i <= 100:
-            for i in range(len(v)):
-                g = np.dot(weights,feats[i].T)
-                for j in range(2):
-                    weights[j] = weights[j] + 0.1*(v[i]-(1.0/(1+np.exp(-g))))*feats[i,j]
+            for j in range(len(v)):
+                g = np.dot(weights,feats[j].T)
+                for k in range(2):
+                    weights[k] = weights[k] + 0.1*(v[j]-(1.0/(1+np.exp(-g))))*feats[j,k]
             i = i+1
         
         printout(1.0/(1+np.exp(-np.dot(weights, feats.T))))
